@@ -62,5 +62,9 @@ class UserRepository:
         user.password = new_hashed_password
         db.commit()
 
+    def update_password(self, db: Session, user: User, new_hashed_password: str) -> None:
+        user.password = new_hashed_password
+        db.commit()
+
 
 user_repo = UserRepository()

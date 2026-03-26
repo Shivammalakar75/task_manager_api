@@ -6,7 +6,7 @@ from app.core.security import get_current_user
 from app.schemas.user_schema import (
     UserRegister, UserLogin, TokenResponse, RefreshTokenRequest,
     AccessTokenResponse, ForgotPasswordRequest, ResetPasswordRequest,
-    UpdateProfileRequest, UserOut,
+    UpdateProfileRequest, UserOut, ChangePasswordRequest
 )
 from app.schemas.common import MessageResponse
 from app.services.auth_service import auth_service
@@ -51,6 +51,15 @@ def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
 @router.post("/reset-password", response_model=MessageResponse)
 def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
     return auth_service.reset_password(db, data.token, data.new_password)
+
+
+@router.put("/change-password", response_model=MessageResponse)
+def change_password(
+    data: ChangePasswordRequest,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return auth_service.change_password(db, current_user, data)
 
 
 @router.delete("/me", response_model=MessageResponse)

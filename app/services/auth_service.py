@@ -12,7 +12,7 @@ from app.core.security import (
 from app.repositories.user_repository import user_repo
 from app.schemas.user_schema import (
     UserRegister, UserLogin, UpdateProfileRequest,
-    TokenResponse, AccessTokenResponse, UserOut,
+    TokenResponse, AccessTokenResponse, UserOut,ChangePasswordRequest
 )
 
 
@@ -116,6 +116,14 @@ class AuthService:
 
         user_repo.clear_reset_token_and_set_password(db, user, hash_password(new_password))
         return {"message": "Password reset successfully. You can now login."}
+    
+
+    def change_password(self, db: Session, current_user, data: ChangePasswordRequest) -> dict:
+        user = user_repo.get_by_id(db, current_user.id)
+        if not verify_password(data.old_password, user.password):
+            raise HTTPException(status_code=400, detail="Old password is incorrect")
+        user_repo.update_password(db, user, hash_password(data.new_password))
+        return {"message": "Password changed successfully"}
 
     def deactivate(self, db: Session, current_user) -> dict:
         user_repo.deactivate(db, current_user)
